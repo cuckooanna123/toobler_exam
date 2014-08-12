@@ -1,0 +1,18 @@
+body {
+    padding-top: 40px;
+}
+ 
+.form-signup, .form-signin {
+    width: 400px;
+    margin: 0 auto;
+}
+
+/* to make li in ul horizontal*/
+
+#navlist li
+{
+display: inline;
+list-style-type: none;
+padding-right: 20px;
+}
+
