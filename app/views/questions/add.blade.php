@@ -51,7 +51,7 @@
 	$('#qn_category').on('change', function() {
 		  var cat_id = this.value;
 		  var opts = "";
-		   $.post('/fetch',{cat_id:cat_id},function(data){
+		   $.post('/questions/fetch',{cat_id:cat_id},function(data){
             //console.log(data);
             
             $.each(data.languages, function(){
