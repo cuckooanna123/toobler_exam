@@ -51,7 +51,7 @@ $maxCount = count($queslist);
  <div class="container-fluid span12 make-grid">
 	<div class="row-fluid">
 		<div class="offset3 span6 ques_div" id="qs{{$ques['id']}}">
-	    <b>{{ $ques['question'] }}</b>
+	    <b>1. {{ $ques['question'] }}</b>
 	    @if($ques['questionType'] == 1)
 	     @if($ques['option1'] != "")
       {{ Form::label('opt1', $ques['option1']) }}
@@ -136,7 +136,7 @@ $maxCount = count($queslist);
   		$.post('/users/nextQues',params,function(data){
             //console.log(data);
           // calling function to generate question html
-            qusetion = generateHtml(data);
+            qusetion = generateHtml(data,next_count);
 				     $('.ques_div').html(qusetion);
 			
              });
@@ -178,7 +178,7 @@ $maxCount = count($queslist);
       $.post('/users/nextQues',params,function(data){
             //console.log(data);
           // calling function to generate question html
-            qusetion = generateHtml(data);
+            qusetion = generateHtml(data,next_count);
 
              $('.ques_div').html(qusetion);
       
@@ -188,13 +188,13 @@ $maxCount = count($queslist);
 }); // closing document ready
 
 // function to generate question html
-function generateHtml(data){
+function generateHtml(data,qscount){
       
       var qusetion = "";
             // html to display next question
             if(data.status){
                 var ques = data.question;
-              qusetion +='<b>'+ques.question+'</b><br>';
+              qusetion +='<b>'+qscount+'. '+ques.question+'</b><br>';
               if(ques.questionType == 1){
                 if(ques.option1 != ""){
                  var opt1 ='<label for="opt1">'+ques.option1+'</label>'+
