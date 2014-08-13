@@ -120,9 +120,12 @@ $maxCount = count($queslist);
   			}
   		}else if(next_count == max_count){
   			if(tabId == 'tab2'){
-  			$('#tab3').addClass("active");
-  			$('#tab2').removeClass("active");
-  			}
+    			$('#tab3').addClass("active");
+    			$('#tab2').removeClass("active");
+  			}else if(tabId == 'tab1'){
+          $('#tab3').addClass("active");
+          $('#tab1').removeClass("active");
+        }
   		}
   		var params = {
   			l_id:lang_id,
@@ -158,9 +161,12 @@ $maxCount = count($queslist);
   			}
   		}else if(next_count == 1){
   			if(tabId == 'tab2'){
-  			$('#tab1').addClass("active");
-  			$('#tab2').removeClass("active");
-  			}
+    			$('#tab1').addClass("active");
+    			$('#tab2').removeClass("active");
+  			}else if(tabId == 'tab3'){
+          $('#tab1').addClass("active");
+          $('#tab3').removeClass("active");
+        }
   		}
 
       var params = {
@@ -173,7 +179,7 @@ $maxCount = count($queslist);
             //console.log(data);
           // calling function to generate question html
             qusetion = generateHtml(data);
-            
+
              $('.ques_div').html(qusetion);
       
              });
