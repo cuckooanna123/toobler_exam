@@ -50,3 +50,4 @@ Route::get('users/login','UserController@getLogin');
 Route::post('users/signin','UserController@postSignin');
 Route::get('users/start','UserController@getStartpage');
 Route::get('users/exam/{id}','UserController@getExamPage');
+Route::get('users/nextQues','UserController@postNextques');

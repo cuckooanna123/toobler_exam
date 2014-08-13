@@ -10,9 +10,6 @@ class UserController extends BaseController
 	$this->beforeFilter('login_check', array('except' => array('index')));
     }*/
 
-   
-    
-
     protected $layout = "layouts.main";
 
     // load login view
@@ -50,13 +47,12 @@ class UserController extends BaseController
 
     public function getExamPage($uid = ""){
         $userDet = User::find($uid);
-       
+        if($userDet != ''){
          $refl1 = new ReflectionObject($userDet);
          $prop1 = $refl1->getProperty('attributes');
          $prop1->setAccessible(true);
          $user = $prop1->getValue($userDet);
-         /* echo "<pre>";
-        print_r($user);exit;*/
+      
          // fetching name of saved category and language
                 $language1 = Language::where('id',$user['language'])
                 ->lists('language');
@@ -69,8 +65,34 @@ class UserController extends BaseController
                 $user['categoryName']= $category1[0];
                  }
 
-                 $examDetails = array();
+                 $examQuestions = array();
 
-       $this->layout->content = View::make('users.exam',array('user'=>$user)); 
+                 $qsList = Question::where('languageId', '=', $user['language'])
+                ->get();
+                
+                if($qsList != ''){
+                    foreach ($qsList as $ques) {
+                    $refl2 = new ReflectionObject($ques);
+                    $prop2 = $refl2->getProperty('attributes');
+                    $prop2->setAccessible(true);
+                    $question = $prop2->getValue($ques);
+                    array_push($examQuestions, $question);
+                    }
+                    
+            }
+
+            $settings = GeneralSetting ::lists('value','type');
+           
+       $this->layout->content = View::make('users.exam',
+        array('user'=>$user,'queslist'=> $examQuestions,'settings'=>$settings)); 
+   }else{
+        return Redirect::to('users/start')->with('message', 'Action not allowed!');
+   }
     }
+
+    public function postNextques(){
+        
+    }
+
+
 }
