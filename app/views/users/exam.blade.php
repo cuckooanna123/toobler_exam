@@ -50,8 +50,10 @@ $maxCount = count($queslist);
 ?>
  <div class="container-fluid span12 make-grid">
 	<div class="row-fluid">
-		<div class="offset3 span6 ques_div" id="qs{{$ques['id']}}">
+		<div class="offset3 span6 ques_div" >
 	    <b>1. {{ $ques['question'] }}</b>
+      {{ Form::hidden('qid', Input::old( 'qid', $ques['id']),array('id'=>'qid'))}}
+    
 	    @if($ques['questionType'] == 1)
 	     @if($ques['option1'] != "")
       {{ Form::label('opt1', $ques['option1']) }}
@@ -79,7 +81,7 @@ $maxCount = count($queslist);
 		<input type="hidden" value="{{$ques['languageId']}}" id="langId">
 		<input type="hidden" value="{{$maxCount}}" id="max_count">
 </div>
-
+<!-- button dispaly -->
 <div class="tab-content">
     <div class="tab-pane active" id="tab1">
         <a class="btn btn-primary btnNext">Next</a>
@@ -90,8 +92,9 @@ $maxCount = count($queslist);
     </div>
     <div class="tab-pane" id="tab3">
         <a class="btn btn-primary btnPrevious">Previous</a>
-	</div>
+	  </div>
 </div>
+
 </div> 
 
 	
@@ -177,9 +180,16 @@ $maxCount = count($queslist);
       // to load next question
       $.post('/users/nextQues',params,function(data){
             //console.log(data);
+             //change div id 
+            var qst = data.question;
+            var qId = "qs"+qst.id;
+            console.log(qId);
+            $('.ques_div').attr("id",qId);
           // calling function to generate question html
             qusetion = generateHtml(data,next_count);
 
+           
+            // replace question html
              $('.ques_div').html(qusetion);
       
              });
@@ -194,7 +204,7 @@ function generateHtml(data,qscount){
             // html to display next question
             if(data.status){
                 var ques = data.question;
-              qusetion +='<b>'+qscount+'. '+ques.question+'</b><br>';
+              qusetion +='<b>'+qscount+'. '+ques.question+'</b><br><input type="hidden" value="'+ques.id+'" id="qid">';
               if(ques.questionType == 1){
                 if(ques.option1 != ""){
                  var opt1 ='<label for="opt1">'+ques.option1+'</label>'+
