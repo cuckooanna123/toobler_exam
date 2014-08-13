@@ -91,7 +91,32 @@ class UserController extends BaseController
     }
 
     public function postNextques(){
-        
+        $lang_id = Input::get('l_id');
+        $qIndex = (int)Input::get('next_count')-1;
+        $user_id = Input::get('uid');
+
+        $examQuestions = array();
+
+                 $qsList = Question::where('languageId', '=', $lang_id)
+                ->get();
+                
+                if($qsList != ''){
+                    foreach ($qsList as $ques) {
+                    $refl2 = new ReflectionObject($ques);
+                    $prop2 = $refl2->getProperty('attributes');
+                    $prop2->setAccessible(true);
+                    $question = $prop2->getValue($ques);
+                    array_push($examQuestions, $question);
+                    }
+                }
+
+            $current_qs = $examQuestions[$qIndex];
+            if(!empty($current_qs)){
+            return Response ::json(array("status"=>true,'question'=>$current_qs));
+            }else{
+                return Redirect::to('users/exam/'.$user_id)->with('message', 'No more Questions!');
+            }
+
     }
 
 
