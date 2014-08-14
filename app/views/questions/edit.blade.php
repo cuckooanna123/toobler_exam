@@ -6,7 +6,12 @@
         @endforeach
     </ul>
     <?php 
-   	// print_r($question);exit;
+
+    	$stat1 = false;
+        $stat2 = false;
+        $stat3 = false;
+        $stat4 = false;
+
    	// setting status for each radio button
     if($question['questionType'] == 1) {
     	$objcheck = true;
@@ -14,39 +19,19 @@
 
     	if($question['answerOption'] == "Option1"){
     		$stat1 = true;
-    		$stat2 = false;
-    		$stat3 = false;
-    		$stat4 = false;
+    		
     	}else if($question['answerOption'] == "Option2"){
-    		$stat1 = false;
     		$stat2 = true;
-    		$stat3 = false;
-    		$stat4 = false;
+    		
     	}else if($question['answerOption'] == "Option3"){
-    		$stat1 = false;
-    		$stat2 = false;
     		$stat3 = true;
-    		$stat4 = false;
     	}else if($question['answerOption'] == "Option4"){
-    		$stat1 = false;
-    		$stat2 = false;
-    		$stat3 = false;
     		$stat4 = true;
-    	}else{
-    		$stat1 = false;
-    		$stat2 = false;
-    		$stat3 = false;
-    		$stat4 = false;
     	}
     }else{
     	$objcheck = false;
     	$descheck = true;
-
-    	$stat1 = false;
-    	$stat2 = false;
-    	$stat3 = false;
-    	$stat4 = false;
-    }
+ }
     ?>
 
  	{{ Form::select('category', $categories, $question['categoryId'], array('class'=>'input-block-level required','id'=>'qn_category'))}}

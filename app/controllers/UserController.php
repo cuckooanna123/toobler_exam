@@ -44,7 +44,9 @@ class UserController extends BaseController
     public function getStartpage(){
     	$this->layout->content = View::make('users.start');
     }
-
+    /**
+    * function to load exam page
+    */
     public function getExamPage($uid = ""){
         $userDet = User::find($uid);
         if($userDet != ''){
@@ -82,9 +84,23 @@ class UserController extends BaseController
             }
 
             $settings = GeneralSetting ::lists('value','type');
+            $firstQst = $examQuestions[0];
+            $current_qid = $firstQst['id'];
+
+             $responseData = ExamData::where('userid', '=', $uid)
+                ->where('qid', '=', $current_qid)
+                ->first();
+                $refl4 = new ReflectionObject($responseData);
+                $prop4 = $refl4->getProperty('attributes');
+                $prop4->setAccessible(true);
+                $response = $prop4->getValue($responseData);
+                /*echo "<pre>";
+                print_r($response);exit;*/
+
            
        $this->layout->content = View::make('users.exam',
-        array('user'=>$user,'queslist'=> $examQuestions,'settings'=>$settings)); 
+        array('user'=>$user,'queslist'=> $examQuestions,
+            'settings'=>$settings,'response'=>$response)); 
    }else{
         return Redirect::to('users/start')->with('message', 'Action not allowed!');
    }
@@ -138,7 +154,10 @@ class UserController extends BaseController
             }
 
     }
-
+    /**
+    * function to save user response to exam_data table.
+    *
+    */
     public function saveAnswer($data = array()){
        // print_r($data);
         $answerStatus ="";
@@ -189,7 +208,10 @@ class UserController extends BaseController
         }
         
      }
-
+     /**
+     * function  to check whether user's response for a question saved previously.
+     *
+     */
      public function isAnswerSaved($uid="",$qid=""){
         $answerList = ExamData::where('userid', '=', $uid)
                 ->where('qid', '=', $qid)
