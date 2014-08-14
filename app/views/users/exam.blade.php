@@ -1,3 +1,33 @@
+  <?php 
+
+        $stat1 = false;
+        $stat2 = false;
+        $stat3 = false;
+        $stat4 = false;
+    if(!empty($response)){
+    // setting status for each radio button
+    if($response['answer_descriptive'] == NULL) {
+      $objcheck = true; 
+      $descheck = false;
+
+      if($response['answer_option'] == "Option1"){
+        $stat1 = true;
+        
+      }else if($response['answer_option'] == "Option2"){
+        $stat2 = true;
+        
+      }else if($response['answer_option'] == "Option3"){
+        $stat3 = true;
+      }else if($response['answer_option'] == "Option4"){
+        $stat4 = true;
+      }
+    }else{
+      $objcheck = false;
+      $descheck = true;
+    }
+  }
+    ?>
+
 <div class="container-fluid span9 make-grid" >
    <table class="table table-striped ">
 	<tr>
@@ -25,9 +55,8 @@
 			<tr>
 		<th>Max Question Count:</th>
 				<td>
-				@if(count($queslist) > 0)
                 {{ count($queslist) }}
-                 @endif 
+                 
 				</td>
 			</tr>
 			<tr>
@@ -41,16 +70,14 @@
 	</table>
 </div>
 <?php 
-$ques = $queslist[0];
-/*echo "<pre>";
-print_r($ques);
-exit;*/
-
 $maxCount = count($queslist);
+if(!empty($queslist))
+$ques = $queslist[0];
 ?>
  <div class="container-fluid span12 make-grid">
 	<div class="row-fluid">
 		<div class="offset3 span6 ques_div" >
+      @if(isset($ques))
 	    <b>1. {{ $ques['question'] }}</b>
       {{ Form::hidden('qid', Input::old( 'qid', $ques['id']),array('id'=>'qid'))}}
       {{ Form::hidden('qtype', Input::old( 'qtype', $ques['questionType']),array('id'=>'qtype'))}}
@@ -58,24 +85,28 @@ $maxCount = count($queslist);
 	    @if($ques['questionType'] == 1)
 	     @if($ques['option1'] != "")
       {{ Form::label('opt1', $ques['option1']) }}
-      {{ Form::radio('answer', 'Option1', false, array('class'=>'input-block-level','id'=>'opt1')) }}
+      {{ Form::radio('answer', 'Option1', $stat1, array('class'=>'input-block-level','id'=>'opt1')) }}
       @endif
       @if($ques['option2'] != "")
       {{ Form::label('opt2', $ques['option2']) }}
-      {{ Form::radio('answer', 'Option2', false, array('class'=>'input-block-level','id'=>'opt2')) }}
+      {{ Form::radio('answer', 'Option2', $stat2, array('class'=>'input-block-level','id'=>'opt2')) }}
       @endif
       @if($ques['option3'] != "")
       {{ Form::label('opt3', $ques['option3']) }}
-      {{ Form::radio('answer', 'Option3', false, array('class'=>'input-block-level','id'=>'opt3')) }}
+      {{ Form::radio('answer', 'Option3', $stat3, array('class'=>'input-block-level','id'=>'opt3')) }}
       @endif
       @if($ques['option4'] != "")
       {{ Form::label('opt4', $ques['option4']) }}
-      {{ Form::radio('answer', 'Option4', false, array('class'=>'input-block-level','id'=>'opt4')) }}
+      {{ Form::radio('answer', 'Option4', $stat4, array('class'=>'input-block-level','id'=>'opt4')) }}
       @endif
 	    
     	@else
-    	{{ Form::textarea('descriptive_answer', null, array('class'=>'input-block-level des-field','placeholder'=>'Descriptive Answer','id'=>'des_answer')) }}
-    	@endif
+      @if(!empty($response))
+    	{{ Form::textarea('descriptive_answer', $response['answer_descriptive'], array('class'=>'input-block-level des-field','placeholder'=>'Descriptive Answer','id'=>'des_answer')) }}
+      @else
+      {{ Form::textarea('descriptive_answer', null, array('class'=>'input-block-level des-field','placeholder'=>'Descriptive Answer','id'=>'des_answer')) }}
+      @endif <!-- end response check -->
+    	@endif <!-- end qtype check -->
 		</div>
     <!-- hidden values -->
 		<input type="hidden" value="1" id="qcount">
@@ -84,6 +115,8 @@ $maxCount = count($queslist);
     <input type="hidden" value="{{$ques['categoryId']}}" id="catId">
 		<input type="hidden" value="{{$maxCount}}" id="max_count">
 </div>
+ 
+
 <!-- button dispaly -->
 <div class="tab-content">
     <div class="tab-pane active" id="tab1">
@@ -97,6 +130,9 @@ $maxCount = count($queslist);
         <a class="btn btn-primary btnPrevious">Previous</a>
 	  </div>
 </div>
+@else
+No questions yet.!
+@endif <!-- end question exist check -->
 
 </div> 
 
@@ -205,11 +241,11 @@ $maxCount = count($queslist);
       // to load next question
       $.post('/users/nextQues',params,function(data){
             //console.log(data);
+
           // calling function to generate question html
             qusetion = generateHtml(data,next_count);
-
-           
-            // replace question html
+        
+          // replace question html
              $('.ques_div').html(qusetion);
       
              });
@@ -224,33 +260,62 @@ function generateHtml(data,qscount){
             // html to display next question
             if(data.status){
                 var ques = data.question;
+                var resp = data.response;
+
+                  var objcheck1 = "";
+                  var objcheck2 = "";
+                  var objcheck3 = "";
+                  var objcheck4 = "";
+                if(resp.answer_descriptive == null){
+                  if(resp.answer_option == "Option1"){
+                    var objcheck1 = "checked";
+                  }else if(resp.answer_option == "Option2"){
+                    var objcheck2 = "checked";
+                  }else if(resp.answer_option == "Option3"){
+                    var objcheck3 = "checked";
+                  }else if(resp.answer_option == "Option4"){
+                    var objcheck4 = "checked";
+                  }
+                   }
+                 
+
               qusetion +='<b>'+qscount+'. '+ques.question+'</b><br>'+
               '<input type="hidden" value="'+ques.id+'" id="qid">'+
               '<input type="hidden" value="'+ques.questionType+'" id="qtype">';
               if(ques.questionType == 1){
                 if(ques.option1 != ""){
                  var opt1 ='<label for="opt1">'+ques.option1+'</label>'+
-                 '<input type="radio" class="radio" name="answer" value="Option1" id="opt1" />';
+                 '<input type="radio" class="radio" name="answer" value="Option1" id="opt1" '+objcheck1+'/>';
                  qusetion +=opt1;
                 }
                 if(ques.option2 != ""){
                  var opt2 ='<label for="opt2">'+ques.option2+'</label>'+
-                 '<input type="radio" class="radio" name="answer" value="Option2" id="opt2" />';
+                 '<input type="radio" class="radio" name="answer" value="Option2" id="opt2" '+objcheck2+'/>';
                  qusetion +=opt2;
                 }
                 if(ques.option3 != ""){
                  var opt3 ='<label for="opt3">'+ques.option3+'</label>'+
-                 '<input type="radio" class="radio" name="answer" value="Option3" id="opt3" />';
+                 '<input type="radio" class="radio" name="answer" value="Option3" id="opt3" '+objcheck3+'/>';
                  qusetion +=opt3;
                 }
                 if(ques.option4 != ""){
                  var opt4 ='<label for="opt4">'+ques.option4+'</label>'+
-                 '<input type="radio" class="radio" name="answer" value="Option4" id="opt4" />';
+                 '<input type="radio" class="radio" name="answer" value="Option4" id="opt4" '+objcheck4+'/>';
                  qusetion +=opt4;
                 }
 
               }else{
-                qusetion +='<textarea rows="5" cols="50" id="des_answer" placeholder="Type your answer"></textarea>';
+                
+                console.log(resp.answer_descriptive);
+                if(resp.answer_descriptive == null){
+                 
+                   qusetion +='<textarea  class="input-block-level des-field" id="des_answer" placeholder="Type your answer"></textarea>';
+                  
+                }
+                else{
+                  
+                  qusetion +='<textarea  class="input-block-level des-field" id="des_answer" placeholder="Type your answer">'+resp.answer_descriptive+'</textarea>';
+                }
               }
               return qusetion;
             }

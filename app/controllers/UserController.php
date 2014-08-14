@@ -84,16 +84,22 @@ class UserController extends BaseController
             }
 
             $settings = GeneralSetting ::lists('value','type');
+            $response = array();
+            if(!empty($examQuestions)){
             $firstQst = $examQuestions[0];
             $current_qid = $firstQst['id'];
+            
 
              $responseData = ExamData::where('userid', '=', $uid)
                 ->where('qid', '=', $current_qid)
                 ->first();
+                if($responseData != ''){
                 $refl4 = new ReflectionObject($responseData);
                 $prop4 = $refl4->getProperty('attributes');
                 $prop4->setAccessible(true);
                 $response = $prop4->getValue($responseData);
+            }
+        }
                 /*echo "<pre>";
                 print_r($response);exit;*/
 
@@ -131,7 +137,7 @@ class UserController extends BaseController
         $answer_data['qtype'] = $qtype;
         $statu = $this->saveAnswer($answer_data);
 
-       $examQuestions = array();
+       $examQuestions = $current_qs = array();
 
                  $qsList = Question::where('languageId', '=', $lang_id)
                 ->get();
@@ -147,8 +153,24 @@ class UserController extends BaseController
                 }
 
             $current_qs = $examQuestions[$qIndex];
+
             if(!empty($current_qs)){
-            return Response ::json(array("status"=>true,'question'=>$current_qs));
+
+                $current_qid = $current_qs['id'];
+                $response = array();
+                $responseData = ExamData::where('userid', '=', $user_id)
+                ->where('qid', '=', $current_qid)
+                ->first();
+
+                if($responseData != ''){
+                $refl4 = new ReflectionObject($responseData);
+                $prop4 = $refl4->getProperty('attributes');
+                $prop4->setAccessible(true);
+                $response = $prop4->getValue($responseData);
+                }
+
+            return Response ::json(array("status"=>true,'question'=>$current_qs,
+                'response'=>$response));
             }else{
                 return Redirect::to('users/exam/'.$user_id)->with('message', 'No more Questions!');
             }
