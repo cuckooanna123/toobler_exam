@@ -7,8 +7,11 @@
     <title>InternalExam</title>
     {{ HTML::style('packages/bootstrap/css/bootstrap.min.css') }}
     {{ HTML::style('css/main.css')}}
+    {{ HTML::style('css/jquery.countdown.css')}}
     {{ HTML::script('js/jquery.js')}}
     {{ HTML::script('js/jquery.validate.js')}}
+    {{ HTML::script('js/jquery.plugin.js')}}
+    {{ HTML::script('js/jquery.countdown.js')}}
   </head>
  
   <body>

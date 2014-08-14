@@ -56,13 +56,19 @@
 				</td>
 			</tr>
 			<tr>
-		<th>Max Exam Time:</th>
+		  <th>Max Exam Time:</th>
 				<td>
 				@if(count($settings) > 0)
                 {{ $settings['max_exam_time'] }}
                 @endif 
 				</td>
 			</tr>
+      <tr class="timer">
+      <th> Time Remaining:</th>
+        <td>
+        <div id="defaultCountdown"></div>
+        </td>
+      </tr>
 	</table>
 </div>
 <?php 
@@ -110,6 +116,7 @@ $ques = $queslist[0];
 		<input type="hidden" value="{{$ques['languageId']}}" id="langId">
     <input type="hidden" value="{{$ques['categoryId']}}" id="catId">
 		<input type="hidden" value="{{$maxCount}}" id="max_count">
+    <input type="hidden" value="{{ $settings['max_exam_time'] }}" id="exam_time">
 </div>
  
 
@@ -129,16 +136,19 @@ $ques = $queslist[0];
 @else
 No questions yet.!
 @endif <!-- end question exist check -->
-
+<a class="btn btn-success btnFinished">Finished</a>
 </div> 
-
-	
-
-	
 
 
 <script type="text/javascript">
   $(document).ready(function(e){
+
+    // set counter maximum exam time
+    var exam_time = $('#exam_time').val();
+    var time = exam_time.split(':');
+    var Until = '+'+time[0]+'h +'+time[1]+'m +'+time[2]+'s';
+    //console.log(Until);
+    $('#defaultCountdown').countdown({until: Until});
 
     // next button click
   	$('.btnNext').click(function(){
@@ -247,6 +257,31 @@ No questions yet.!
              });
   });
 
+  $('.btnFinished').click(function(){
+
+    var lang_id = $('#langId').val();
+      var catId = $('#catId').val();
+      var uid = $('#user_id').val();
+
+
+      var params = {
+        l_id:lang_id,
+        catId:catId,
+        uid:uid
+      };
+
+    $.post('/users/processData',params,function(data){
+            //console.log(data);
+
+          // show message
+          if(data.status){
+             $('.row').html('<p class="alert">You completed with '+data.correct+' answers and '+data.wrong+' answers</p>');
+            // $('<p class="alert">You completed with '+data.correct+' answers and '+data.wrong+' answers</p>').insertAfter('.timer');
+           }
+      
+             });
+  });
+
 }); // closing document ready
 
 // function to generate question html
@@ -274,7 +309,7 @@ function generateHtml(data,qscount){
                   }
                    }
                  
-                 
+
              qusetion +='<b>'+qscount+'. '+ques.question+'</b><br>'+
               '<input type="hidden" value="'+ques.id+'" id="qid">'+
               '<input type="hidden" value="'+ques.questionType+'" id="qtype">';

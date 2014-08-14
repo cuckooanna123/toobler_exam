@@ -120,8 +120,9 @@ class UserController extends BaseController
 
         $lang_id = Input::get('l_id');
         $cat_id = Input::get('catId');
-        $qIndex = (int)Input::get('next_count')-1;
         $user_id = Input::get('uid');
+
+        $qIndex = (int)Input::get('next_count')-1; 
         $qid = Input::get('qid');
         $qtype = Input::get('qtype');
         $des_ans = Input::get('des_ans');
@@ -248,6 +249,60 @@ class UserController extends BaseController
                 }
                 
      }
+
+
+     public function postprocessData(){
+        $lang_id = Input::get('l_id');
+        $cat_id = Input::get('catId');
+        $user_id = Input::get('uid');
+
+        $des_count = 0;
+        $correct_count = 0;
+        $wrong_count = 0;
+        
+        $exam_data = ExamData::where('userid', '=', (int)$user_id)
+                ->where('category', '=', (int)$cat_id)
+                ->where('language', '=', (int)$lang_id)
+                ->get();
+
+            if($exam_data != ''){
+                foreach ($exam_data as $exdata) {
+
+                    $refl4 = new ReflectionObject($exdata);
+                    $prop4 = $refl4->getProperty('attributes');
+                    $prop4->setAccessible(true);
+                    $response = $prop4->getValue($exdata);
+                   // print_r($response);
+
+                    if($response['answer_status'] == 2){
+                        $des_count += 1;
+                    }else if($response['answer_status'] == 1){
+                        $correct_count += 1;
+                    }else if($response['answer_status'] == 0){
+                        $wrong_count += 1;
+                    }
+                }
+
+
+                    $result = new ExamResult;
+                    $result->language_id = $lang_id;
+                    $result->user_id = $cat_id;
+                    $result->category_id = $user_id;
+
+                    $result->correct_count = $correct_count;
+                    $result->wrong_count = $wrong_count;
+                    $result->descriptive_count = $des_count;
+                    $result->total_marks = $correct_count;
+                    $stat = $result->save();
+                    if($stat){
+                    return Response ::json(array("status"=>true,'correct'=>$correct_count,
+                    'wrong'=>$wrong_count));
+                    }else{
+                        return Response ::json(array("status"=>false));
+                    }
+            }
+
+        }
 
 
 }
