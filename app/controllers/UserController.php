@@ -127,6 +127,7 @@ class UserController extends BaseController
         $des_ans = Input::get('des_ans');
         $obj_ans = Input::get('obj_ans');
 
+        // to save response
         $answer_data = array();
         $answer_data['lang_id'] = $lang_id;
         $answer_data['cat_id'] = $cat_id;
@@ -137,6 +138,7 @@ class UserController extends BaseController
         $answer_data['qtype'] = $qtype;
         $statu = $this->saveAnswer($answer_data);
 
+        // fetching next question from list of questions of spec language
        $examQuestions = $current_qs = array();
 
                  $qsList = Question::where('languageId', '=', $lang_id)
@@ -154,6 +156,7 @@ class UserController extends BaseController
 
             $current_qs = $examQuestions[$qIndex];
 
+            // fetch response data if previously saved.
             if(!empty($current_qs)){
 
                 $current_qid = $current_qs['id'];
@@ -178,7 +181,7 @@ class UserController extends BaseController
     }
     /**
     * function to save user response to exam_data table.
-    *
+    * @author ans
     */
     public function saveAnswer($data = array()){
        // print_r($data);
@@ -206,7 +209,7 @@ class UserController extends BaseController
              }
              //echo "stat:".$answerStatus;exit;
         $savedItem = $this->isAnswerSaved($uid,$qid);
-        if($savedItem == null){
+        if($savedItem == null){ // save new entry
             $dataItem = new ExamData;
             $dataItem->userid = $uid;
             $dataItem->qid = $qid;
@@ -217,7 +220,7 @@ class UserController extends BaseController
             $dataItem->answer_status = $answerStatus;
             $status = $dataItem->save();
             return $status;
-        }else{
+        }else{ // update entry
             $savedItem->userid = $uid;
             $savedItem->qid = $qid;
             $savedItem->answer_option = $obj_ans;
@@ -232,7 +235,7 @@ class UserController extends BaseController
      }
      /**
      * function  to check whether user's response for a question saved previously.
-     *
+     * @author ans
      */
      public function isAnswerSaved($uid="",$qid=""){
         $answerList = ExamData::where('userid', '=', $uid)

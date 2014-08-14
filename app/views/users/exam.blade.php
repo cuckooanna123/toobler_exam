@@ -1,5 +1,5 @@
   <?php 
-
+      // to display selected option in objective questions.
         $stat1 = false;
         $stat2 = false;
         $stat3 = false;
@@ -7,9 +7,7 @@
     if(!empty($response)){
     // setting status for each radio button
     if($response['answer_descriptive'] == NULL) {
-      $objcheck = true; 
-      $descheck = false;
-
+      
       if($response['answer_option'] == "Option1"){
         $stat1 = true;
         
@@ -21,13 +19,11 @@
       }else if($response['answer_option'] == "Option4"){
         $stat4 = true;
       }
-    }else{
-      $objcheck = false;
-      $descheck = true;
     }
   }
     ?>
 
+<!-- block displaying exam -->
 <div class="container-fluid span9 make-grid" >
    <table class="table table-striped ">
 	<tr>
@@ -261,7 +257,7 @@ function generateHtml(data,qscount){
             if(data.status){
                 var ques = data.question;
                 var resp = data.response;
-
+                // to display selected option in objective questions.
                   var objcheck1 = "";
                   var objcheck2 = "";
                   var objcheck3 = "";
@@ -278,8 +274,8 @@ function generateHtml(data,qscount){
                   }
                    }
                  
-
-              qusetion +='<b>'+qscount+'. '+ques.question+'</b><br>'+
+                 
+             qusetion +='<b>'+qscount+'. '+ques.question+'</b><br>'+
               '<input type="hidden" value="'+ques.id+'" id="qid">'+
               '<input type="hidden" value="'+ques.questionType+'" id="qtype">';
               if(ques.questionType == 1){
