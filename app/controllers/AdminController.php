@@ -6,9 +6,9 @@ class AdminController extends AdminbaseController
     public function __construct() {
 
         $this->beforeFilter('login_check',
-         array('except' => array('getLogin','postSignin','getForgot','postChange')));
+         array('except' => array('getLogin','postSignin','getForgot','postChange','getClearsession')));
         $this->beforeFilter('admin_check',
-         array('except' => array('getLogin','postSignin','getForgot','postChange','getLogout')));
+         array('except' => array('getLogin','postSignin','getForgot','postChange','getLogout','getClearsession')));
     }
     // loading main layout
     protected $layout = "layouts.main"; 
@@ -98,23 +98,38 @@ class AdminController extends AdminbaseController
      * function to logout
      * @author ans 
      */
-    public function getLogout() {
+    public function getLogout($timeOut = false) {
      if(Session::get('userType') == 'admin'){
         $isAdmin = true;
      }else{
        $isAdmin = false; 
      }
+     $timeOut = Input::get('timeOut');
+     // to give diff message time out
+     if($timeOut){
+        $msg = "You have reached the allowed time limit and hence logged out!";
+     }else{
+        $msg = 'Your are now logged out!';
+     }
+
     Session::forget('userType');
     Session::forget('userId');
+    Session::forget('isFinished');
     Auth::logout();
     if($isAdmin){
-       return Redirect::to('admin/login')->with('message', 'Your are now logged out!'); 
+       return Redirect::to('admin/login')->with('message', $msg); 
     }else{
-        return Redirect::to('users/login')->with('message', 'Your are now logged out!'); 
+        return Redirect::to('users/login')->with('message', $msg); 
     }
     
     }
 
+   
+
+
+    /**
+    * display admin settings page
+    */
     public function getSettings(){
        $allSettings = GeneralSetting::all();
        

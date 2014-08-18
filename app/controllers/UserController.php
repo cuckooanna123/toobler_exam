@@ -3,12 +3,10 @@
 class UserController extends BaseController
 {
 
-
-	/*public function __construct() {
-	//$this->beforeFilter('csrf', array('on'=>'post'));
-	$this->beforeFilter('admin_check', array('except' => array('index')));	
-	$this->beforeFilter('login_check', array('except' => array('index')));
-    }*/
+  public function __construct() {
+	//$this->beforeFilter('csrf', array('on'=>'post'));	
+	$this->beforeFilter('login_check', array('except' => array('getLogin','postSignin')));
+    }
 
     protected $layout = "layouts.main";
 
@@ -41,13 +39,28 @@ class UserController extends BaseController
     	}
     }
 
+     // function to clear session on time out
+    public function postClearsession(){
+        Session::forget('userType');
+        Session::forget('userId'); 
+        Session::forget('isFinished'); 
+        return Response ::json(array("status"=>true));
+    }
+
     public function getStartpage(){
-    	$this->layout->content = View::make('users.start');
+        if(Session::has('isFinished')){
+             $this->layout->content = View::make('users.finished');
+        }else{   
+        $this->layout->content = View::make('users.start');
+        }
     }
     /**
     * function to load exam page
     */
     public function getExamPage($uid = ""){
+
+        if(!Session::has('isFinished')){
+            
         $userDet = User::find($uid);
         if($userDet != ''){
          $refl1 = new ReflectionObject($userDet);
@@ -108,6 +121,9 @@ class UserController extends BaseController
         array('user'=>$user,'queslist'=> $examQuestions,
             'settings'=>$settings,'response'=>$response)); 
    }else{
+        return Redirect::to('users/start')->with('message', 'Action not allowed!');
+   }
+}else{
         return Redirect::to('users/start')->with('message', 'Action not allowed!');
    }
     }
@@ -183,9 +199,9 @@ class UserController extends BaseController
 
     /*
     * function to save final question before finish action
-    *
     */
     public function postSavefinish(){
+
 
         $lang_id = Input::get('l_id');
         $cat_id = Input::get('catId');
@@ -207,6 +223,7 @@ class UserController extends BaseController
         $answer_data['qtype'] = $qtype;
         $status = $this->saveAnswer($answer_data);
         if($status){
+            Session::put('isFinished', true);
         return Response ::json(array("status"=>true));
         }else{
         return Response ::json(array("status"=>false)); 

@@ -28,7 +28,7 @@
                     <li>{{ HTML::link('languages/list', 'Languages') }}</li>
                     <li>{{ HTML::link('admin/userlist', 'Users') }}</li>
                     @endif
-                    <li>{{ HTML::link('admin/logout','Logout', array('class' => 'btn btn-warning'))}}</li>        
+                    <li>{{ HTML::link('admin/logout','Logout', array('class' => 'btn btn-warning','id'=>'logout'))}}</li>        
                 @else
                    <li>{{ HTML::link('admin/login', 'Admin Login') }}</li> 
                    <li>{{ HTML::link('users/login', 'User Login') }}</li> 

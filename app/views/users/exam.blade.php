@@ -24,6 +24,7 @@
     ?>
 
 <!-- block displaying exam -->
+<div class="container-fluid span12 outer">
 <div class="container-fluid span9 make-grid" >
    <table class="table table-striped ">
 	<tr>
@@ -116,6 +117,7 @@ $ques = $queslist[0];
 		<input type="hidden" value="{{$ques['languageId']}}" id="langId">
     <input type="hidden" value="{{$ques['categoryId']}}" id="catId">
 		<input type="hidden" value="{{$maxCount}}" id="max_count">
+    <input type="hidden" value="{{ $user['fullname'] }}" id="user_fullname">
     <input type="hidden" value="{{ $settings['max_exam_time'] }}" id="exam_time">
 </div>
  
@@ -136,19 +138,43 @@ $ques = $queslist[0];
 @else
 No questions yet.!
 @endif <!-- end question exist check -->
-<a class="btn btn-success btnFinished">Finished</a>
+<a class="btn btn-success btnFinished top-right">Exam Finished</a>
 </div> 
 
-
+</div>
 <script type="text/javascript">
   $(document).ready(function(e){
 
-    // set counter maximum exam time
+    // set counter for  maximum exam time
     var exam_time = $('#exam_time').val();
     var time = exam_time.split(':');
     var Until = '+'+time[0]+'h +'+time[1]+'m +'+time[2]+'s';
     //console.log(Until);
-    $('#defaultCountdown').countdown({until: Until});
+   // $('#defaultCountdown').countdown({until: Until});
+
+
+    $('#defaultCountdown').countdown({until: Until,  
+      onExpiry: liftOff}); 
+
+      function liftOff() { 
+      alert('You have reached the maximum time limit!'); 
+      //timeOut();
+       var params = {
+      } 
+
+      $.post('/users/clearsession',params,function(data){
+            console.log(data); 
+            if(data.status){
+              homePage();
+            }
+     });
+    
+      } 
+ 
+    
+    function homePage(){
+      window.location="http://localhost:8000/users/login";
+    }
 
     // next button click
   	$('.btnNext').click(function(){
@@ -257,6 +283,7 @@ No questions yet.!
              });
   });
 
+  // exam finish button click
   $('.btnFinished').click(function(){
 
       var tabId = $( this ).parent().attr('id');
@@ -264,6 +291,7 @@ No questions yet.!
       var next_count = parseInt(qcount)-1;
       $('#qcount').val(next_count);
       var max_count = $('#max_count').val();
+      var user_fullname = $('#user_fullname').val();
       var lang_id = $('#langId').val();
       var catId = $('#catId').val();
       var uid = $('#user_id').val();
@@ -289,11 +317,12 @@ No questions yet.!
         uid:uid
       };
 
+
           // to save last loaded question's answer on finish button click
       $.post('/users/savefinish',params,function(data){
             console.log(data);
             if(data.status){
-            finishExam(finish_params);
+            finishExam(finish_params,max_count,user_fullname);
               }
              });
 
@@ -306,15 +335,28 @@ No questions yet.!
 
 
 // function to save marks on exam finish
-function finishExam(params){
+function finishExam(params,max_count,user_fullname){
 
     $.post('/users/processData',params,function(data){
             //console.log(data);
-
-          // show message
+            var res = "";
+   // show message
           if(data.status){
-             $('.row').html('<p class="alert">You completed with '+data.correct+' correct answers and '+data.wrong+' wrong answers</p>');
-            // $('<p class="alert">You completed with '+data.correct+' answers and '+data.wrong+' answers</p>').insertAfter('.timer');
+             //$('.outer').html('<p class="alert">You completed with '+data.correct+' correct answers and '+data.wrong+' wrong answers</p>');
+
+              res += "<h3>Exam Summary</h3>"+
+              "<table class='table table-striped ''>"+
+                        "<tr><th>Name:</th>"+
+                        "<td>"+user_fullname+"</td></tr>"+
+                        "<tr><th>Question count:</th>"+
+                        "<td>"+max_count+"</td></tr>"+
+                        "<tr><th>Correct answer:</th>"+
+                        "<td>"+data.correct+"</td></tr>"+
+                        "<tr><th>Wrong answer:</th>"+
+                        "<td>"+data.wrong+"</td></tr>"+
+                        "</table>";
+                        $('.outer').html(res);
+            
            }
       
              });

@@ -22,3 +22,9 @@ padding-right: 20px;
 	padding: 15px;margin:5px
 }
 
+.top-right{
+	position: absolute;
+    top:400px;
+    right:200px;
+}
+
