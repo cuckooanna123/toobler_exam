@@ -259,30 +259,66 @@ No questions yet.!
 
   $('.btnFinished').click(function(){
 
-    var lang_id = $('#langId').val();
+      var tabId = $( this ).parent().attr('id');
+      var qcount = $('#qcount').val();
+      var next_count = parseInt(qcount)-1;
+      $('#qcount').val(next_count);
+      var max_count = $('#max_count').val();
+      var lang_id = $('#langId').val();
       var catId = $('#catId').val();
       var uid = $('#user_id').val();
-
+      var qid = $('#qid').val();
+      var qtype = $('#qtype').val();
+      var des_answer = $(document).find('textarea#des_answer').val();
+      var opt = $('input[name=answer]:checked').val();
 
       var params = {
         l_id:lang_id,
         catId:catId,
+        next_count:next_count,
+        uid:uid,
+        qid:qid,
+        qtype:qtype,
+        des_ans: des_answer,
+        obj_ans: opt
+      };
+
+      var finish_params = {
+        l_id:lang_id,
+        catId:catId,
         uid:uid
       };
+
+          // to save last loaded question's answer on finish button click
+      $.post('/users/savefinish',params,function(data){
+            console.log(data);
+            if(data.status){
+            finishExam(finish_params);
+              }
+             });
+
+      
+      
+
+  });
+
+}); // closing document ready
+
+
+// function to save marks on exam finish
+function finishExam(params){
 
     $.post('/users/processData',params,function(data){
             //console.log(data);
 
           // show message
           if(data.status){
-             $('.row').html('<p class="alert">You completed with '+data.correct+' answers and '+data.wrong+' answers</p>');
+             $('.row').html('<p class="alert">You completed with '+data.correct+' correct answers and '+data.wrong+' wrong answers</p>');
             // $('<p class="alert">You completed with '+data.correct+' answers and '+data.wrong+' answers</p>').insertAfter('.timer');
            }
       
              });
-  });
-
-}); // closing document ready
+}
 
 // function to generate question html
 function generateHtml(data,qscount){

@@ -137,7 +137,7 @@ class UserController extends BaseController
         $answer_data['des_ans'] = $des_ans;
         $answer_data['obj_ans'] = $obj_ans;
         $answer_data['qtype'] = $qtype;
-        $statu = $this->saveAnswer($answer_data);
+        $status = $this->saveAnswer($answer_data);
 
         // fetching next question from list of questions of spec language
        $examQuestions = $current_qs = array();
@@ -178,6 +178,39 @@ class UserController extends BaseController
             }else{
                 return Redirect::to('users/exam/'.$user_id)->with('message', 'No more Questions!');
             }
+
+    }
+
+    /*
+    * function to save final question before finish action
+    *
+    */
+    public function postSavefinish(){
+
+        $lang_id = Input::get('l_id');
+        $cat_id = Input::get('catId');
+        $user_id = Input::get('uid');
+
+        $qid = Input::get('qid');
+        $qtype = Input::get('qtype');
+        $des_ans = Input::get('des_ans');
+        $obj_ans = Input::get('obj_ans');
+
+        // to save response
+        $answer_data = array();
+        $answer_data['lang_id'] = $lang_id;
+        $answer_data['cat_id'] = $cat_id;
+        $answer_data['user_id'] = $user_id;
+        $answer_data['qid'] = $qid;
+        $answer_data['des_ans'] = $des_ans;
+        $answer_data['obj_ans'] = $obj_ans;
+        $answer_data['qtype'] = $qtype;
+        $status = $this->saveAnswer($answer_data);
+        if($status){
+        return Response ::json(array("status"=>true));
+        }else{
+        return Response ::json(array("status"=>false)); 
+        }
 
     }
     /**
@@ -282,18 +315,31 @@ class UserController extends BaseController
                         $wrong_count += 1;
                     }
                 }
+                    $prev_result = $this->isResultSaved($user_id,$lang_id,$cat_id);
+                    if($prev_result != null){
 
+                    $prev_result->language_id = $lang_id;
+                    $prev_result->user_id = $user_id;
+                    $prev_result->category_id = $cat_id;
+
+                    $prev_result->correct_count = $correct_count;
+                    $prev_result->wrong_count = $wrong_count;
+                    $prev_result->descriptive_count = $des_count;
+                    $prev_result->total_marks = $correct_count;
+                    $stat = $prev_result->save();
+                    }else{
 
                     $result = new ExamResult;
                     $result->language_id = $lang_id;
-                    $result->user_id = $cat_id;
-                    $result->category_id = $user_id;
+                    $result->user_id = $user_id;
+                    $result->category_id = $cat_id;
 
                     $result->correct_count = $correct_count;
                     $result->wrong_count = $wrong_count;
                     $result->descriptive_count = $des_count;
                     $result->total_marks = $correct_count;
                     $stat = $result->save();
+                    }
                     if($stat){
                     return Response ::json(array("status"=>true,'correct'=>$correct_count,
                     'wrong'=>$wrong_count));
@@ -303,6 +349,23 @@ class UserController extends BaseController
             }
 
         }
+
+         /**
+     * function  to check whether result saved previously.
+     * @author ans
+     */
+     public function isResultSaved($uid="",$lid="",$cid=""){
+        $resultList = ExamResult::where('user_id', '=', $uid)
+                ->where('language_id', '=', $lid)
+                ->where('category_id', '=', $cid)
+                ->first();
+                if(count($resultList) != 0){
+                    return $resultList;
+                }else{
+                    return null;
+                }
+                
+     }
 
 
 }
