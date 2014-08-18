@@ -78,8 +78,8 @@ if(!empty($queslist))
 $ques = $queslist[0];
 ?>
  <div class="container-fluid span12 make-grid">
-	<div class="row-fluid">
-		<div class="offset3 span6 ques_div" >
+	<div class="row-fluid ques_div">
+		<div class="offset3 span6 " >
       @if(isset($ques))
 	    <b>1. {{ $ques['question'] }}</b>
       {{ Form::hidden('qid', Input::old( 'qid', $ques['id']),array('id'=>'qid'))}}
@@ -111,16 +111,17 @@ $ques = $queslist[0];
       @endif <!-- end response check -->
     	@endif <!-- end qtype check -->
 		</div>
+ 
+</div>
+
     <!-- hidden values -->
-		<input type="hidden" value="1" id="qcount">
+    <input type="hidden" value="1" id="qcount">
     <input type="hidden" value="{{$user['id']}}" id="user_id">
-		<input type="hidden" value="{{$ques['languageId']}}" id="langId">
+    <input type="hidden" value="{{$ques['languageId']}}" id="langId">
     <input type="hidden" value="{{$ques['categoryId']}}" id="catId">
-		<input type="hidden" value="{{$maxCount}}" id="max_count">
+    <input type="hidden" value="{{$maxCount}}" id="max_count">
     <input type="hidden" value="{{ $user['fullname'] }}" id="user_fullname">
     <input type="hidden" value="{{ $settings['max_exam_time'] }}" id="exam_time">
-</div>
- 
 
 <!-- button dispaly -->
 <div class="tab-content">
@@ -138,7 +139,6 @@ $ques = $queslist[0];
 @else
 No questions yet.!
 @endif <!-- end question exist check -->
-<a class="btn btn-success btnFinished top-right">Exam Finished</a>
 </div> 
 
 </div>
@@ -222,7 +222,7 @@ No questions yet.!
   		$.post('/users/nextQues',params,function(data){
             //console.log(data);
           // calling function to generate question html
-            qusetion = generateHtml(data,next_count);
+            qusetion = generateHtml(data,next_count,max_count);
 				     $('.ques_div').html(qusetion);
 			
              });
@@ -275,7 +275,7 @@ No questions yet.!
             //console.log(data);
 
           // calling function to generate question html
-            qusetion = generateHtml(data,next_count);
+            qusetion = generateHtml(data,next_count,max_count);
         
           // replace question html
              $('.ques_div').html(qusetion);
@@ -283,9 +283,10 @@ No questions yet.!
              });
   });
 
-  // exam finish button click
-  $('.btnFinished').click(function(){
 
+  // exam finish button click
+  //$('.btnFinished').click(function(){
+    $(document).on('click', '.btnFinished', function () {
       var tabId = $( this ).parent().attr('id');
       var qcount = $('#qcount').val();
       var next_count = parseInt(qcount)-1;
@@ -353,8 +354,12 @@ function finishExam(params,max_count,user_fullname){
                         "<tr><th>Correct answer:</th>"+
                         "<td>"+data.correct+"</td></tr>"+
                         "<tr><th>Wrong answer:</th>"+
-                        "<td>"+data.wrong+"</td></tr>"+
-                        "</table>";
+                        "<td>"+data.wrong+"</td></tr>";
+                        if(data.des_count>0){
+                          res += "<tr><th>Descriptive question count:</th>"+
+                        "<td>"+data.des_count+"</td></tr>";
+                        }
+                        res += "</table>";
                         $('.outer').html(res);
             
            }
@@ -363,7 +368,7 @@ function finishExam(params,max_count,user_fullname){
 }
 
 // function to generate question html
-function generateHtml(data,qscount){
+function generateHtml(data,qscount,max_count){
       
       var qusetion = "";
             // html to display next question
@@ -386,8 +391,10 @@ function generateHtml(data,qscount){
                     var objcheck4 = "checked";
                   }
                    }
-                 
-
+            if(max_count == qscount){
+             qusetion +='<a class="btn btn-success btnFinished top-right">Exam Finished</a>';
+            }
+             qusetion +='<div class="offset3 span6 " >';
              qusetion +='<b>'+qscount+'. '+ques.question+'</b><br>'+
               '<input type="hidden" value="'+ques.id+'" id="qid">'+
               '<input type="hidden" value="'+ques.questionType+'" id="qtype">';
@@ -425,6 +432,7 @@ function generateHtml(data,qscount){
                   
                   qusetion +='<textarea  class="input-block-level des-field" id="des_answer" placeholder="Type your answer">'+resp.answer_descriptive+'</textarea>';
                 }
+                qusetion +='</div>';
               }
               return qusetion;
             }

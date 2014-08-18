@@ -60,7 +60,7 @@ class UserController extends BaseController
     public function getExamPage($uid = ""){
 
         if(!Session::has('isFinished')){
-            
+
         $userDet = User::find($uid);
         if($userDet != ''){
          $refl1 = new ReflectionObject($userDet);
@@ -359,7 +359,7 @@ class UserController extends BaseController
                     }
                     if($stat){
                     return Response ::json(array("status"=>true,'correct'=>$correct_count,
-                    'wrong'=>$wrong_count));
+                    'wrong'=>$wrong_count,'des_count'=>$des_count));
                     }else{
                         return Response ::json(array("status"=>false));
                     }
