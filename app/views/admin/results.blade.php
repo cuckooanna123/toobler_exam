@@ -53,6 +53,12 @@
             window.location="http://localhost:8000/result/details/"+id;
         });
 
+       $('.pdf-det').click(function(e){
+            var id = e.target.id;
+            console.log("id:"+id)
+            e.preventDefault();
+            window.location="http://localhost:8000/download/pdf/"+id;
+        });
         
 
         
