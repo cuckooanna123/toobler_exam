@@ -27,6 +27,7 @@
                     <li>{{ HTML::link('admin/settings', 'Settings') }}</li>
                     <li>{{ HTML::link('languages/list', 'Languages') }}</li>
                     <li>{{ HTML::link('admin/userlist', 'Users') }}</li>
+                    <li>{{ HTML::link('result/list', 'Results') }}</li>
                     @endif
                     <li>{{ HTML::link('admin/logout','Logout', array('class' => 'btn btn-warning','id'=>'logout'))}}</li>        
                 @else

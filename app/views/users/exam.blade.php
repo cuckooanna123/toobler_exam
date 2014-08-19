@@ -315,7 +315,8 @@ No questions yet.!
       var finish_params = {
         l_id:lang_id,
         catId:catId,
-        uid:uid
+        uid:uid,
+        total_qs_count: max_count
       };
 
 

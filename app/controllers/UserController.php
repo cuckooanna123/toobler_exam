@@ -305,6 +305,7 @@ class UserController extends BaseController
         $lang_id = Input::get('l_id');
         $cat_id = Input::get('catId');
         $user_id = Input::get('uid');
+        $total_qs_count = Input::get('total_qs_count');
 
         $des_count = 0;
         $correct_count = 0;
@@ -338,6 +339,7 @@ class UserController extends BaseController
                     $prev_result->language_id = $lang_id;
                     $prev_result->user_id = $user_id;
                     $prev_result->category_id = $cat_id;
+                    $prev_result->total_qs_count = $total_qs_count;
 
                     $prev_result->correct_count = $correct_count;
                     $prev_result->wrong_count = $wrong_count;
@@ -350,6 +352,7 @@ class UserController extends BaseController
                     $result->language_id = $lang_id;
                     $result->user_id = $user_id;
                     $result->category_id = $cat_id;
+                    $result->total_qs_count = $total_qs_count;
 
                     $result->correct_count = $correct_count;
                     $result->wrong_count = $wrong_count;
