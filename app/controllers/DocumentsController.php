@@ -186,7 +186,56 @@ public function showPdf($uid = ''){
 
 }
 	
+public function resultMail(){
 
+    $emailArray = Input::get('emailArray');
+    $uid = Input::get('uid');
+    
+
+    $res_data = ExamResult::where('user_id', '=', $uid)->first();
+
+    if($res_data != null){
+         $refl1 = new ReflectionObject($res_data);
+         $prop1 = $refl1->getProperty('attributes');
+         $prop1->setAccessible(true);
+         $result = $prop1->getValue($res_data);
+         
+
+         // fetching name of saved category and language
+                $language1 = Language::where('id',$result['language_id'])
+                ->lists('language');
+                if(!empty($language1)){
+                $result['langName'] = $language1[0] ;
+                }
+                $category1 = Category::where('id',$result['category_id'])
+                ->lists('category');
+                if(!empty($category1)){
+                $result['categoryName']= $category1[0];
+                 }
+                 $user1 = User::where('id',$result['user_id'])
+                ->lists('fullname');
+                if(!empty($user1)){
+                $result['fullname'] = $user1[0] ;
+                }
+
+             
+            $subject = "Exam Result";
+
+            // smtp mailing function
+
+            foreach ($emailArray as $email) {
+                
+                Mail::send('admin.resultmail',array('result'=>$result), function($message) use ($email,$subject)
+                {
+                    $message->to($email, 'you')->subject($subject);
+                });
+            }
+           
+          
+           return Response ::json(array("status"=>true));
 
 }
-?>
+
+}
+
+}

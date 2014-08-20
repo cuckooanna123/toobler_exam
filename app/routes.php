@@ -57,6 +57,7 @@ Route::post('users/clearsession','UserController@postClearsession');
 
 Route::get('result/list', 'DocumentsController@resultPage');
 Route::get('result/details/{id}', 'DocumentsController@resultDetails');
+Route::post('result/mail','DocumentsController@resultMail');
 Route::get('test/pdf/{id}','DocumentsController@showPdf');
 Route::get('download/pdf/{id}', 'DocumentsController@downloadFile');
 Route::get('test','DocumentsController@getTest'); 
