@@ -36,11 +36,14 @@
                     <div class="modal-header">
                       <button type="button" class="close close-modal" id="<?php echo $user['id'];?>"  data-dismiss="modal" aria-hidden="true">×</button>
                       <h4 class="modal-title">Email Result To</h4>
+                      <span class="alert alert-success" style="display:none" ></span>
+                      <span class="alert alert-danger" style="display:none" ></span>
                     </div>
                     <div class="modal-body" id="modal-body<?php echo $user['id'];?>">
-                      <input type="text" id="email1" value="<?php echo $user['email'];?>">
-                      <input type="hidden" id="e-count" value="1">
+                      <input type="text" class="email" id="email1" value="<?php echo $user['email'];?>">
                       <a href="#" class="btn btn-primary mv-right add-btn">Add Email</a>
+                      <br><span id="msg1"></span>
+                      <input type="hidden" id="e-count" value="1">
                     </div>
                     <div class="modal-footer">
                       <a href="#" data-dismiss="modal" id="<?php echo $user['id'];?>" class="btn close-modal">Close</a>
@@ -93,13 +96,31 @@
         $('#myModal'+id).hide();
         });
 
+       // checking validity of email address
+       $(document).on('change','.email',function(e){
+
+        var email = this.value;
+        var field_id = this.id;
+        var id = field_id.replace("email", ""); 
+        //console.log(id);
+         if(!isValidEmailAddress(email)) 
+        {
+         $('#msg'+id).html("invalid email:"+email);
+         $(this).val('');
+        }else{
+          $('#msg'+id).html(""); 
+        }
+
+       });
+
+       
        $('.add-btn').click(function(e){
         var id = e.target.id;
         var e_count = $('#e-count').val();
         var count = parseInt(e_count)+1;
         $('#e-count').val(count);
-        var input = "<br><span id='span-email"+count+"'><input type='text'  id='email"+count+"' placeholder='enter email' value=''>"
-        +"<button type='button' class='remove' id='email"+count+"' >×</button></span>";
+        var input = "<br><span id='span-email"+count+"'><input type='text' class='email'  id='email"+count+"' placeholder='enter email' value=''>"
+        +"<button type='button' class='remove' id='email"+count+"' >×</button><br><span id='msg"+count+"'></span></span>";
         //console.log(input);
         $('.modal-body'+id).append(input);
         });
@@ -120,27 +141,42 @@
 
         for (i = 1; i <= e_count; i++) {
         var email = $('#email'+i).val();
-        console.log(email);
-        emailArray.push(email);
-        }
-        //console.log(emailArray);
+        //console.log(email);
+        if(email !=''){
+          emailArray.push(email); 
+        } 
+        } 
+        console.log(emailArray);
+        
         var uid = $('#uid').val();
+        // checking whether empty field left
+      if(e_count != emailArray.length){
+        $('.alert-danger').show();
+        $('.alert-danger').html("please don't leave empty fields!"); 
+      }else{
 
-        var params = {
-        uid:uid,
-        emailArray: emailArray
-      };
-
+         var params = {
+          uid:uid,
+          emailArray: emailArray
+        };
 
       // to save last loaded question's answer on finish button click
       $.post('/result/mail',params,function(data){
             console.log(data);
             if(data.status){
-            console.log("mail send");
+            $('.alert-success').show();
+            $('.alert-success').html("mail send sucessfully");
               }
              });
+      }
 
         });
+
+
+       function isValidEmailAddress(emailAddress) {
+        var pattern = new RegExp(/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i);
+        return pattern.test(emailAddress);
+        };
         
     });
 
