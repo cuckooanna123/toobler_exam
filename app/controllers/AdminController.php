@@ -10,6 +10,7 @@ class AdminController extends AdminbaseController
         $this->beforeFilter('admin_check',
          array('except' => array('getLogin','postSignin','getForgot','postChange','getLogout','getClearsession')));
     }
+
     // loading main layout
     protected $layout = "layouts.main"; 
 
@@ -156,16 +157,24 @@ class AdminController extends AdminbaseController
         if ($validator2->passes()) {
 
         $min = (int)Input::get('exam_time'); 
-         
+        $qcount = (int)Input::get('max_qs_count');
+
+        $type_array = array('max_exam_time','max_ques_count');
+
         $hour = floor($min / 60);
         $min -= $hour * 60;
         $timeStamp = sprintf('%02d:%02d:00', $hour, $min); 
-       
-            // save settings
-            $setting = new GeneralSetting;
-            $setting->type = "max_exam_time";
-            $setting->value = $timeStamp;
-            $setting->save();
+
+        $value_array = array($timeStamp,$qcount);
+
+           for ($i=0; $i <count($type_array) ; $i++) { 
+                // save settings
+                $setting = new GeneralSetting;
+                $setting->type = $type_array[$i];
+                $setting->value = $value_array[$i];
+                $setting->save();
+           }
+           
             return Redirect::to('admin/settings')->with('message', 'Exam time upadated successfully!');
         }else{
              return Redirect::to('admin/settings')->with('message', 'The following errors occurred')
@@ -178,24 +187,33 @@ class AdminController extends AdminbaseController
 
      public function getSettingsedit($id = ""){
 
-        $item = GeneralSetting::find($id);
-        if($item != null){
-            $refl4 = new ReflectionObject($item);
+        $allSettings = GeneralSetting::all();
+
+        //$item = GeneralSetting::find($id);
+        if($allSettings != null){
+            $settingsArray = array();
+            foreach ($allSettings as $setting_item) {
+
+            $refl4 = new ReflectionObject($setting_item);
             $prop4 = $refl4->getProperty('attributes');
             $prop4->setAccessible(true);
-            $setting_item = $prop4->getValue($item);
-            /*echo "<pre>";
-            print_r($setting_item);exit;*/
-            $item_type = $setting_item['type'];
-            if($item_type == 'max_exam_time'){
-            $time_string = $setting_item['value'];
-            $timeArray =  explode(":",$time_string);
-            $time_min= $timeArray[0]*60+$timeArray[1];
+            $item = $prop4->getValue($setting_item);
 
-            $setting_item['time_min'] = $time_min;
-            }
+                $item_type = $item['type'];
+                if($item_type == 'max_exam_time'){
+                $time_string = $item['value'];
+                $timeArray =  explode(":",$time_string);
+                $time_min= $timeArray[0]*60+$timeArray[1];
+
+                $item['time_min'] = $time_min;
+                }
+                array_push($settingsArray,$item);
+
+              }  
+           /* echo "<pre>";
+            print_r($settingsArray);exit;*/
             
-            $this->layout->content = View::make('admin.settingEdit')->with('item',$setting_item);
+           $this->layout->content = View::make('admin.settingEdit')->with('settings',$settingsArray);
         }else{
            return Redirect::to('admin/settings')->with('message', 'No such settings exist!');  
         }
@@ -208,18 +226,29 @@ class AdminController extends AdminbaseController
         if ($validator3->passes()) {
 
         $min = (int)Input::get('exam_time'); 
-        $item_id = (int)Input::get('item_id');
-        $item_type = Input::get('item_type');
+        $item_id1 = (int)Input::get('item_id1');
+        $item_type1 = Input::get('item_type1');
+
+        $qcount = (int)Input::get('max_qs_count'); 
+        $item_id2 = (int)Input::get('item_id2');
+        $item_type2 = Input::get('item_type2');
 
         $hour = floor($min / 60);
         $min -= $hour * 60;
         $timeStamp = sprintf('%02d:%02d:00', $hour, $min); 
        
             // save settings
-            $item1 = GeneralSetting::find($item_id);
-            $item1->type = $item_type;
+            $item1 = GeneralSetting::find($item_id1);
+            $item1->type = $item_type1;
             $item1->value = $timeStamp;
             $item1->save();
+
+            // save settings
+            $item2 = GeneralSetting::find($item_id2);
+            $item2->type = $item_type2;
+            $item2->value = $qcount;
+            $item2->save();
+        
             return Redirect::to('admin/settings')->with('message', 'Settings upadated successfully!');
         }else{
              return Redirect::to('admin/settings')->with('message', 'The following errors occurred')

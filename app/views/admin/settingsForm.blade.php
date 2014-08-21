@@ -8,6 +8,8 @@
     
     {{ Form::label('exam_time', 'Maximum exam time in minutes'); }} 
     {{ Form::text('exam_time', null, array('class'=>'input-block-level required number', 'placeholder'=>'Exam Time in Minutes')) }}
+    {{ Form::label('max_qs_count', 'Maximum number of questions for exam'); }} 
+    {{ Form::text('max_qs_count', null, array('class'=>'input-block-level required number', 'placeholder'=>'Maximum question count')) }}
     
  
     {{ Form::submit('Save', array('class'=>'btn btn-large btn-primary btn-block'))}}
