@@ -53,5 +53,6 @@
 			</tr>
 			@endif
 			</table>
+			<a class="btn btn-primary btnBack" href="http://localhost:8000/result/list">Back</a>
 		</div>
    

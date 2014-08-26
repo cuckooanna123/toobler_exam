@@ -49,7 +49,7 @@ class UserController extends BaseController
 
     public function getStartpage(){
         if(Session::has('isFinished')){
-             $this->layout->content = View::make('users.finished');
+        $this->layout->content = View::make('users.finished');
         }else{   
         $this->layout->content = View::make('users.start');
         }
@@ -83,7 +83,8 @@ class UserController extends BaseController
                  $examQuestions = array();
 
                  $qsList = Question::where('languageId', '=', $user['language'])
-                ->get();
+                 -> where('categoryId', '=', $user['category'])
+                 ->get();
                 
                 if($qsList != ''){
                     foreach ($qsList as $ques) {
@@ -221,9 +222,10 @@ class UserController extends BaseController
         $answer_data['des_ans'] = $des_ans;
         $answer_data['obj_ans'] = $obj_ans;
         $answer_data['qtype'] = $qtype;
+        
         $status = $this->saveAnswer($answer_data);
         if($status){
-            Session::put('isFinished', true);
+        Session::put('isFinished', true);
         return Response ::json(array("status"=>true));
         }else{
         return Response ::json(array("status"=>false)); 

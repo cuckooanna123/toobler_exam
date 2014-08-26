@@ -37,7 +37,7 @@
 		<th>Category:</th>
 				<td>
 				@if(isset($user['categoryName']))
-                {{ $user['categoryName'] }}
+                {{$user['categoryName'] }}
                  @endif
 				</td>
 			</tr>
@@ -129,11 +129,12 @@ $ques = $queslist[0];
         <a class="btn btn-primary btnNext">Next</a>
     </div>
     <div class="tab-pane" id="tab2">
-        <a class="btn btn-primary btnNext">Next</a>
         <a class="btn btn-primary btnPrevious">Previous</a>
+        <a class="btn btn-primary btnNext">Next</a>
     </div>
     <div class="tab-pane" id="tab3">
         <a class="btn btn-primary btnPrevious">Previous</a>
+        <a class="btn btn-success btnFinished">Submit</a>
 	  </div>
 </div>
 @else
@@ -392,9 +393,9 @@ function generateHtml(data,qscount,max_count){
                     var objcheck4 = "checked";
                   }
                    }
-            if(max_count == qscount){
+           /* if(max_count == qscount){
              qusetion +='<a class="btn btn-success btnFinished top-right">Exam Finished</a>';
-            }
+            }*/
              qusetion +='<div class="offset3 span6 " >';
              qusetion +='<b>'+qscount+'. '+ques.question+'</b><br>'+
               '<input type="hidden" value="'+ques.id+'" id="qid">'+

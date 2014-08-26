@@ -184,8 +184,10 @@ class AdminController extends AdminbaseController
       
     }
 
-
-     public function getSettingsedit($id = ""){
+    /**
+    * function to edit settings
+    */
+     public function getSettingsedit(){
 
         $allSettings = GeneralSetting::all();
 
@@ -219,6 +221,9 @@ class AdminController extends AdminbaseController
         }
     }
 
+    /**
+    * function to update general settings
+    */
     public function postUpdatesettings(){
         
         $validator3 = Validator::make(Input::all(), GeneralSetting::$rules);
@@ -295,7 +300,7 @@ class AdminController extends AdminbaseController
         $user->userType = "user";
         $user->save();
 
-    return Redirect::to('admin/newuser')->with('message', 'User added succesfully!');
+    return Redirect::to('admin/userlist')->with('message', 'User added succesfully!');
     }else{
         return Redirect::to('admin/newuser')->with('message', 'The following errors occurred')
                 ->withErrors($validator4)->withInput(); 
@@ -317,6 +322,7 @@ class AdminController extends AdminbaseController
     public function getUserlist(){
 
         $users = User::where('userType', '=', "user")
+        ->orderBy('id', 'DESC')
         ->paginate(2);
 
         $userArray = array();
