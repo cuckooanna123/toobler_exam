@@ -50,6 +50,8 @@
 
 	$('#qn_category').on('change', function() {
 		  var cat_id = this.value;
+		  
+
 		  var opts = "";
 		   $.post('/questions/fetch',{cat_id:cat_id},function(data){
             //console.log(data);

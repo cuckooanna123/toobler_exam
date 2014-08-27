@@ -158,19 +158,31 @@ class QuestionsController extends AdminbaseController
 	    public function getList($lang_id){
 
 	    	$qs_type = 1;
-	    	if(isset($_GET['type'])){
-	    	$qs_type = $_GET['type']; 
+	    	if(isset($_GET['qtype'])){
+	    	 $qs_type = $_GET['qtype']; 
 	    	}
+	    	$q = '';
+	    	if(isset($_GET['query'])){
+	    	 $q = $_GET['query']; 
+	    	}
+
 
 	    	if($lang_id != ''&& $qs_type != ''){
 	    		$qsList = Question::where('languageId', '=', $lang_id)
 	    		->where('questionType', '=', $qs_type)
+	    		->where('question', 'LIKE', '%'. $q .'%')
 	    		->paginate(2);
+
+	    		/*$queries = DB::getQueryLog();
+	 	 		$last_query = end($queries);
+	  			print_r($last_query);exit;
+				*/
+	    		$qsList->appends(array('type' => $qs_type,'query'=>$q))->links(); 
 
 	    		
 	    		//fetch details of parent lanuage and category
 	    		$langDet = Language::find($lang_id);
-	 		if($langDet != ''){
+	 			if($langDet != ''){
 	    			$refl4 = new ReflectionObject($langDet);
 					$prop4 = $refl4->getProperty('attributes');
 					$prop4->setAccessible(true);
@@ -252,6 +264,8 @@ class QuestionsController extends AdminbaseController
 	    	return Redirect::to('questions/add')->with('message', 'No language stored under this category!');
 	    }
 }
+
+
 
 }
 ?>

@@ -2,22 +2,39 @@
 
 <?php 
 $qs_type = 1;
-if(isset($_GET['type']))
-$qs_type = (int)$_GET['type'];
+if(isset($_GET['qtype']))
+$qs_type = (int)$_GET['qtype'];
 if($qs_type == 1){
     $type1 = true;
     $type2 = false;
 }else{
     $type1 = false;
     $type2 = true;
-}?>
+}
+$query ='';
+if(isset($_GET['query']))
+$query = $_GET['query'];?>
 <h5>Category:<i><?php echo $language['CategoryName']; ?></i></h5>
 <h5>Language:<i><?php echo $language['language']; ?></i> {{ HTML::link('questions/add','Add Question', array('class' => 'btn btn-info')) }}</h5>
 
-{{ Form::label('objective-1', 'Objective Questions') }}
-{{ Form::radio('qtype', 'objectiveQs', $type1, array('class'=>'input-block-level required','id'=>'objective-1')) }}
-{{ Form::label('descriptive-1', 'Descriptive Questions') }}
-{{ Form::radio('qtype', 'descriptiveQs', $type2, array('class'=>'input-block-level required','id'=>'descriptive-1')) }}
+
+
+<div class="search">
+
+     {{ Form::model(null, array( 'method' => 'GET','url' => 'questions/list/'.$language["id"]))}}
+
+    {{ Form::label('objective-1', 'Objective Questions') }}
+    {{ Form::radio('qtype', '1', $type1, array('class'=>'input-block-level required','id'=>'objective-1')) }}
+    {{ Form::label('descriptive-1', 'Descriptive Questions') }}
+    {{ Form::radio('qtype', '0', $type2, array('class'=>'input-block-level required','id'=>'descriptive-1')) }} 
+
+    {{ Form::text('query', $query, array( 'placeholder' => 'Search query...','id'=>'query' )) }}
+
+    {{ Form::submit('Search',array('id' => 'search')) }}
+
+    {{ Form::close() }} 
+
+</div>
 
 <input type="hidden" name="lang_id" id="lang_id" value="<?php echo $language['id']; ?>">
 
@@ -29,7 +46,7 @@ if($qs_type == 1){
         <th>Question Type</th>
         @if( $qs_type === 1)
         <th>Options</th>
-        @endif
+        @endif 
         <th></th>
         <th></th>
         </tr>
@@ -38,9 +55,9 @@ if($qs_type == 1){
         @foreach($questions as $ques)
         <tr id="row{{$ques['id']}}">
         
-			<td>{{ $ques['question'] }}</td>
+            <td>{{ $ques['question'] }}</td>
             <td>
-            	@if((int)$ques['questionType'] === 1)
+                @if((int)$ques['questionType'] === 1)
                 Objective
                 @else
                 Descriptive
@@ -94,19 +111,7 @@ if($qs_type == 1){
             window.location="http://localhost:8000/questions/edit/"+id;
         });
 
-        $('#objective-1').click(function(e){
-            var lang_id = $('#lang_id').val();
-            console.log("id:"+lang_id)
-            e.preventDefault();
-            window.location="http://localhost:8000/questions/list/"+lang_id+"?type=1";
-        });
-
-         $('#descriptive-1').click(function(e){
-            var lang_id = $('#lang_id').val();
-            console.log("id:"+lang_id)
-            e.preventDefault();
-            window.location="http://localhost:8000/questions/list/"+lang_id+"?type=0";
-        });
+        
   
     });
 
